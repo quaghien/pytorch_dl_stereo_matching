@@ -47,6 +47,8 @@ def main() -> None:
         left_folder, right_folder, raw_channels = DATA_FOLDERS[args.data_version]
         root = Path(args.data_root) / "testing"
         stems = sorted(p.stem for p in (root / left_folder).glob("*_10.png"))
+        if not stems:
+            raise ValueError(f"No testing samples found under {root / left_folder}")
         sample_keys = stems[args.start_id : args.start_id + args.num_imgs]
         first_left, _ = read_stereo_pair_by_name(root, left_folder, right_folder, sample_keys[0], raw_channels)
         use_raw_layout = True
@@ -62,7 +64,8 @@ def main() -> None:
         for sample_key in sample_keys:
             if use_raw_layout:
                 left_folder, right_folder, _ = DATA_FOLDERS[args.data_version]
-                left_img, right_img = read_stereo_pair_by_name(Path(args.data_root) / "testing", left_folder, right_folder, sample_key, in_channels)
+                testing_root = Path(args.data_root) / "testing"
+                left_img, right_img = read_stereo_pair_by_name(testing_root, left_folder, right_folder, sample_key, in_channels)
                 output_stem = sample_key
             else:
                 file_id = int(sample_key)

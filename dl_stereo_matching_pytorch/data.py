@@ -174,7 +174,13 @@ class RawKittiStereoCache:
         left_folder, right_folder, self.num_channels = _validate_data_version(self.data_version)
         self.left_folder = left_folder
         self.right_folder = right_folder
-        self.root = Path(self.data_root) / self.split
+        self.data_root = Path(self.data_root)
+        self.root = self.data_root / self.split
+        if not self.root.exists():
+            raise ValueError(
+                f"Expected KITTI split directory at {self.root}. "
+                "Please set --data-root to the directory that directly contains training/ and testing/."
+            )
         self.left_images: Dict[str, np.ndarray] = {}
         self.right_images: Dict[str, np.ndarray] = {}
         self.disparities: Dict[str, np.ndarray] = {}
