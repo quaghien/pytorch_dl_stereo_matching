@@ -78,6 +78,23 @@ Trong lúc train, code sẽ tự ghi log vào:
 dl_stereo_matching_pytorch/model_win37_kitti2012_quality/train.log
 ```
 
+Evaluate checkpoint vừa train:
+
+```bash
+python -m dl_stereo_matching_pytorch.evaluate \
+  --data-root dl_stereo_matching_pytorch/data \
+  --util-root dl_stereo_matching_pytorch/data \
+  --model-dir dl_stereo_matching_pytorch/model_win37_kitti2012_quality \
+  --data-version kitti2012 \
+  --net-type win37_dep9 \
+  --patch-size 37 \
+  --disp-range 256 \
+  --num-tr-img 160 \
+  --num-val-img 34 \
+  --num-val-loc 5000 \
+  --batch-size 200
+```
+
 Vì sao dùng `train-samples-per-epoch=50000`:
 
 - Bài này train theo `patch pair`, không phải theo số ảnh.
@@ -108,18 +125,6 @@ Trên Colab, chỉ cần:
 3. Run all.
 
 Nếu dùng GPU nhiều VRAM hơn, có thể tăng `BATCH_SIZE` trong notebook lên `256`, `384` hoặc `512` rồi theo dõi lại throughput và VRAM.
-
-Evaluate:
-
-```bash
-python -m dl_stereo_matching_pytorch.evaluate \
-  --data-root PATH_DATABASE \
-  --util-root PATH_BINARY_OR_EMPTY \
-  --model-dir MODEL_DIR \
-  --net-type win37_dep9 \
-  --patch-size 37 \
-  --disp-range 256
-```
 
 Infer full image:
 

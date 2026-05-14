@@ -1,0 +1,21 @@
+{
+  "batch_size": 128,
+  "data_root": "dl_stereo_matching_pytorch/data",
+  "data_version": "kitti2012",
+  "device": "cuda",
+  "disp_range": 256,
+  "eval_every": 100,
+  "learning_rate": 0.001,
+  "model_dir": "dl_stereo_matching_pytorch/model_win37_kitti2012_quality",
+  "momentum": 0.9,
+  "net_type": "win37_dep9",
+  "num_iter": 40000,
+  "num_tr_img": 160,
+  "num_val_img": 34,
+  "num_val_loc": 5000,
+  "optimizer": "adam",
+  "patch_size": 37,
+  "train_samples_per_epoch": 50000,
+  "util_root": "dl_stereo_matching_pytorch/data",
+  "weight_decay": 0.0005
+}

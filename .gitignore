@@ -20,7 +20,7 @@ __pycache__/
 /dl_stereo_matching_pytorch/data/*.zip
 /dl_stereo_matching_pytorch/data_stereo_flow/
 /dl_stereo_matching_pytorch/data_stereo_flow.zip
-/dl_stereo_matching_pytorch/model_*/
+# /dl_stereo_matching_pytorch/model_*/
 /dl_stereo_matching_pytorch/tmp_*/
 /dl_stereo_matching_pytorch/**/*.pt
 /dl_stereo_matching_pytorch/**/*.pth
