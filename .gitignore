@@ -1,0 +1,27 @@
+.env
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local env and OS noise
+.DS_Store
+
+# Keep the legacy TensorFlow folder local-only unless explicitly needed
+/dl_stereo_matching/
+
+# Training artifacts for the PyTorch stereo port
+/dl_stereo_matching_pytorch/data/training/
+/dl_stereo_matching_pytorch/data/testing/
+/dl_stereo_matching_pytorch/data/*.zip
+/dl_stereo_matching_pytorch/model_*/
+/dl_stereo_matching_pytorch/tmp_*/
+/dl_stereo_matching_pytorch/**/*.pt
+/dl_stereo_matching_pytorch/**/*.pth
+/dl_stereo_matching_pytorch/**/*.ckpt
+/dl_stereo_matching_pytorch/**/*.log
+/dl_stereo_matching_pytorch/**/*.png
