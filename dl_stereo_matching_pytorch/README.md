@@ -72,6 +72,12 @@ python -m dl_stereo_matching_pytorch.train \
 
 `--num-iter 40000` nghĩa là train đủ `40000` step thì dừng.
 
+Trong lúc train, code sẽ tự ghi log vào:
+
+```text
+dl_stereo_matching_pytorch/model_win37_kitti2012_quality/train.log
+```
+
 Vì sao dùng `train-samples-per-epoch=50000`:
 
 - Bài này train theo `patch pair`, không phải theo số ảnh.

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import torch
@@ -51,6 +52,21 @@ def infinite_loader(loader: DataLoader):
             yield batch
 
 
+class TeeStream:
+    def __init__(self, *streams) -> None:
+        self.streams = streams
+
+    def write(self, data: str) -> int:
+        for stream in self.streams:
+            stream.write(data)
+            stream.flush()
+        return len(data)
+
+    def flush(self) -> None:
+        for stream in self.streams:
+            stream.flush()
+
+
 def save_checkpoint(model_dir: Path, model: torch.nn.Module, optimizer: torch.optim.Optimizer, step: int, args: argparse.Namespace) -> None:
     model_dir.mkdir(parents=True, exist_ok=True)
     torch.save(
@@ -88,6 +104,25 @@ def update_learning_rate(optimizer: torch.optim.Optimizer, base_lr: float, step:
 def main() -> None:
     args = parse_args()
     validate_patch_size(args.net_type, args.patch_size)
+    model_dir = Path(args.model_dir)
+    model_dir.mkdir(parents=True, exist_ok=True)
+
+    log_path = model_dir / "train.log"
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+    with log_path.open("a", encoding="utf-8") as log_file:
+        tee = TeeStream(original_stdout, log_file)
+        sys.stdout = tee
+        sys.stderr = TeeStream(original_stderr, log_file)
+        try:
+            run_training(args, model_dir)
+        finally:
+            sys.stdout = original_stdout
+            sys.stderr = original_stderr
+
+
+def run_training(args: argparse.Namespace, model_dir: Path) -> None:
+    print(f"logging to {model_dir / 'train.log'}")
 
     train_dataset, val_dataset = build_patch_datasets(
         data_version=args.data_version,
@@ -126,13 +161,13 @@ def main() -> None:
         if step % args.eval_every == 0:
             mean_loss = sum(losses) / len(losses)
             print(f"step={step} loss={mean_loss:.6f} lr={lr:.6e}")
-            save_checkpoint(Path(args.model_dir), model, optimizer, step, args)
+            save_checkpoint(model_dir, model, optimizer, step, args)
             losses.clear()
 
     if losses:
         mean_loss = sum(losses) / len(losses)
         print(f"final_step={args.num_iter} loss={mean_loss:.6f}")
-        save_checkpoint(Path(args.model_dir), model, optimizer, args.num_iter, args)
+        save_checkpoint(model_dir, model, optimizer, args.num_iter, args)
 
     print(f"training samples={len(train_dataset)} validation samples={len(val_dataset)}")
 
