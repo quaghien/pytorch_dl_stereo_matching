@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import torch
@@ -27,8 +28,43 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+class TeeStream:
+    def __init__(self, *streams) -> None:
+        self.streams = streams
+
+    def write(self, data: str) -> int:
+        for stream in self.streams:
+            stream.write(data)
+            stream.flush()
+        return len(data)
+
+    def flush(self) -> None:
+        for stream in self.streams:
+            stream.flush()
+
+
 def main() -> None:
     args = parse_args()
+    model_dir = Path(args.model_dir)
+    model_dir.mkdir(parents=True, exist_ok=True)
+
+    log_path = model_dir / "eval.log"
+    original_stdout = sys.stdout
+    original_stderr = sys.stderr
+    with log_path.open("a", encoding="utf-8") as log_file:
+        tee = TeeStream(original_stdout, log_file)
+        sys.stdout = tee
+        sys.stderr = TeeStream(original_stderr, log_file)
+        try:
+            run_evaluation(args, model_dir)
+        finally:
+            sys.stdout = original_stdout
+            sys.stderr = original_stderr
+
+
+def run_evaluation(args: argparse.Namespace, model_dir: Path) -> None:
+    print(f"logging to {model_dir / 'eval.log'}")
+
     receptive_field = get_network_spec(args.net_type).receptive_field
     if args.patch_size != receptive_field:
         raise ValueError(f"patch_size must be {receptive_field} for {args.net_type}, got {args.patch_size}")
@@ -45,7 +81,7 @@ def main() -> None:
         train_samples_per_epoch=None,
     )
 
-    checkpoint = torch.load(Path(args.model_dir) / "checkpoint.pt", map_location="cpu")
+    checkpoint = torch.load(model_dir / "checkpoint.pt", map_location="cpu")
     device = torch.device(args.device)
     model = create_model(args.net_type, val_dataset.cache.num_channels).to(device)
     model.load_state_dict(checkpoint["model_state_dict"])

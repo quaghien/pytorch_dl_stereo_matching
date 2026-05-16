@@ -14,6 +14,9 @@ Toàn bộ mã chạy trong thư mục này, không import gì từ thư mục `
 - `evaluate.py`: đánh giá 3-pixel accuracy trên validation patches
 - `infer.py`: sinh disparity map cho ảnh đầy đủ
 - `tests/`: unit tests tự chứa bằng dữ liệu giả lập
+- `DATA.md`: mô tả cấu trúc data, pipeline xử lý data và sample minh hoạ
+- `TRAINING.md`: mô tả pipeline train, sample train, loss và kiến trúc model
+- `TRAIN_ARGS.md`: giải thích ý nghĩa các tham số CLI khi train
 - `PAPER.md`: ghi chú paper bằng tiếng Việt
 
 ## Quick Start
@@ -95,6 +98,26 @@ python -m dl_stereo_matching_pytorch.evaluate \
   --batch-size 200
 ```
 
+Trong lúc evaluate, code sẽ tự ghi log vào:
+
+```text
+dl_stereo_matching_pytorch/model_win37_kitti2012_quality/eval.log
+```
+
+Infer một vài ảnh:
+
+```bash
+python -m dl_stereo_matching_pytorch.infer \
+  --data-root dl_stereo_matching_pytorch/data \
+  --util-root dl_stereo_matching_pytorch/data \
+  --model-dir dl_stereo_matching_pytorch/model_win37_kitti2012_quality \
+  --out-dir dl_stereo_matching_pytorch/preds_win37 \
+  --data-version kitti2012 \
+  --net-type win37_dep9 \
+  --disp-range 256 \
+  --num-imgs 5
+```
+
 Vì sao dùng `train-samples-per-epoch=50000`:
 
 - Bài này train theo `patch pair`, không phải theo số ảnh.
@@ -130,10 +153,11 @@ Infer full image:
 
 ```bash
 python -m dl_stereo_matching_pytorch.infer \
-  --data-root PATH_DATABASE \
-  --util-root PATH_BINARY_OR_EMPTY \
-  --model-dir MODEL_DIR \
-  --out-dir OUT_DIR \
+  --data-root dl_stereo_matching_pytorch/data \
+  --util-root dl_stereo_matching_pytorch/data \
+  --model-dir dl_stereo_matching_pytorch/model_win37_kitti2012_quality \
+  --out-dir dl_stereo_matching_pytorch/preds_win37 \
+  --data-version kitti2012 \
   --net-type win37_dep9 \
   --disp-range 256 \
   --num-imgs 5
@@ -149,3 +173,12 @@ python -m dl_stereo_matching_pytorch.infer \
 - Với `data_stereo_flow.zip` hiện tại, disparity lớn nhất khoảng `228 px`, nên mặc định CLI đã đổi sang `disp_range=256`.
 - Để ưu tiên chất lượng model cuối, preset khuyến nghị là `win37_dep9 + Adam + weight_decay=5e-4`.
 - Chưa port phần smoothing/CRF hậu xử lý từ paper vì repo TensorFlow hiện tại cũng dừng ở matching network + raw disparity inference.
+
+## Tài liệu dữ liệu
+
+- Xem chi tiết tại [DATA.md](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/DATA.md)
+
+## Tài liệu train
+
+- Xem chi tiết tại [TRAINING.md](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/TRAINING.md)
+- Giải thích tham số train tại [TRAIN_ARGS.md](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/TRAIN_ARGS.md)

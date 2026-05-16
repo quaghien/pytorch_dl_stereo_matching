@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="760" viewBox="0 0 1500 760">
+  <defs>
+    <style>
+      .title { font: 700 30px Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 16px Arial, sans-serif; fill: #475569; }
+      .label { font: 700 18px Arial, sans-serif; fill: #111827; }
+      .text { font: 400 15px Arial, sans-serif; fill: #1f2937; }
+      .mono { font: 600 14px 'Courier New', monospace; fill: #0f172a; }
+      .small { font: 400 13px Arial, sans-serif; fill: #64748b; }
+      .box { rx: 18; ry: 18; stroke: #cbd5e1; stroke-width: 2; }
+      .arrow { stroke: #334155; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect width="1500" height="760" fill="#f8fafc"/>
+
+  <text x="60" y="60" class="title">Simple Stereo Matching Architecture</text>
+  <text x="60" y="92" class="subtitle">Bo qua batch va loss chi tiet, chi giu flow chinh va kich thuoc tensor quan trong.</text>
+
+  <rect x="60" y="170" width="250" height="120" class="box" fill="#dbeafe"/>
+  <text x="85" y="210" class="label">Left Patch</text>
+  <text x="85" y="242" class="mono">1 x 37 x 37</text>
+  <text x="85" y="268" class="small">1 channel, patch trai</text>
+
+  <rect x="60" y="430" width="250" height="140" class="box" fill="#fee2e2"/>
+  <text x="85" y="470" class="label">Right Patch Strip</text>
+  <text x="85" y="502" class="mono">1 x 37 x (37 + disp_range - 1)</text>
+  <text x="85" y="528" class="mono">neu disp_range = 256 -&gt; 1 x 37 x 292</text>
+  <text x="85" y="554" class="small">vung tim kiem theo chieu ngang x</text>
+
+  <rect x="410" y="140" width="300" height="170" class="box" fill="#e0f2fe"/>
+  <text x="435" y="180" class="label">Shared CNN Backbone</text>
+  <text x="435" y="212" class="text">9 conv layers, dung chung trong so</text>
+  <text x="435" y="238" class="text">win37_dep9: 9 x kernel 5x5</text>
+  <text x="435" y="264" class="text">Layer cuoi khong ReLU</text>
+
+  <rect x="410" y="400" width="300" height="170" class="box" fill="#e0f2fe"/>
+  <text x="435" y="440" class="label">Shared CNN Backbone</text>
+  <text x="435" y="472" class="text">Cung backbone nhu nhanh trai</text>
+  <text x="435" y="498" class="text">Input rong hon de chua nhieu vi tri</text>
+  <text x="435" y="524" class="text">ung vien disparity</text>
+
+  <rect x="820" y="170" width="270" height="120" class="box" fill="#dcfce7"/>
+  <text x="845" y="210" class="label">3. Left Feature</text>
+  <text x="845" y="242" class="mono">64 x 1 x 1</text>
+  <text x="845" y="268" class="small">patch trai sau backbone</text>
+
+  <rect x="820" y="430" width="270" height="140" class="box" fill="#fef3c7"/>
+  <text x="845" y="470" class="label">4. Right Features</text>
+  <text x="845" y="502" class="mono">64 x 1 x disp_range</text>
+  <text x="845" y="528" class="mono">neu disp_range = 256 -&gt; 64 x 1 x 256</text>
+  <text x="845" y="554" class="small">moi cot la 1 vi tri disparity ung vien</text>
+
+  <rect x="1190" y="260" width="250" height="210" class="box" fill="#ede9fe"/>
+  <text x="1215" y="300" class="label">Matching Head</text>
+  <text x="1215" y="332" class="text">Nhan feature trai voi tung cot</text>
+  <text x="1215" y="358" class="text">feature ben phai theo channel</text>
+  <text x="1215" y="390" class="mono">score(k) = f_left . f_right(k)</text>
+  <text x="1215" y="422" class="mono">output: disp_range scores</text>
+  <text x="1215" y="448" class="mono">neu disp_range = 256 -&gt; 256 scores</text>
+
+  <rect x="60" y="640" width="1380" height="70" class="box" fill="#ffffff"/>
+  <text x="90" y="683" class="text">Y nghia: patch trai duoc ma hoa thanh 1 vector dac trung, day phai duoc ma hoa thanh nhieu vector dac trung, roi matching head tinh do giong nhau cho tung disparity candidate.</text>
+
+  <path d="M310 230 L410 230" class="arrow"/>
+  <path d="M310 500 L410 500" class="arrow"/>
+  <path d="M710 230 L820 230" class="arrow"/>
+  <path d="M710 500 L820 500" class="arrow"/>
+  <path d="M1090 230 C1140 230, 1150 290, 1190 320" class="arrow"/>
+  <path d="M1090 500 C1140 500, 1150 440, 1190 410" class="arrow"/>
+</svg>

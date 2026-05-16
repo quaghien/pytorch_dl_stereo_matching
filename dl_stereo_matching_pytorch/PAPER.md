@@ -44,6 +44,175 @@ Paper không dùng nhãn one-hot tuyệt đối. Thay vào đó, họ dùng phâ
 
 Loss là cross-entropy trên phân phối disparity. Lựa chọn này phù hợp với thước đo `3-pixel error`.
 
+## 4.1 Hiểu trực giác: dot product ra vector score, vậy ground truth cho vector đó là gì?
+
+Đây là chỗ dễ bị mơ hồ nhất nếu chỉ nhìn công thức.
+
+### Model trả ra gì?
+
+Với một sample train, model nhận:
+
+- một `left_patch`
+- một `right_patch_strip`
+
+Sau backbone:
+
+- nhánh trái ra đúng `1` vector đặc trưng
+- nhánh phải ra một dãy vector đặc trưng theo chiều ngang
+
+Sau đó matching head tính:
+
+```text
+score(k) = f_left . f_right(k)
+```
+
+với:
+
+- `f_left`: vector đặc trưng của patch trái
+- `f_right(k)`: vector đặc trưng ở vị trí disparity ứng viên thứ `k`
+
+Nên đầu ra cuối là:
+
+- một vector `score`
+- độ dài bằng `disp_range`
+
+Ví dụ nếu `disp_range = 256` thì output là:
+
+```text
+[score(0), score(1), ..., score(255)]
+```
+
+Mỗi phần tử trả lời câu hỏi:
+
+- "nếu disparity là `k` thì mức khớp tốt đến đâu?"
+
+### Ground truth cho vector score được lấy từ đâu?
+
+Ground truth không phải do model tự suy ra.
+
+Nó được lấy trực tiếp từ ảnh disparity ground truth:
+
+- `training/disp_noc/*.png`
+
+Trong code:
+
+- chọn một pixel hợp lệ ở ảnh trái tại tọa độ `(x, y)`
+- đọc disparity thật tại điểm đó:
+
+```text
+d = disparity[y, x]
+```
+
+Ở nhánh KITTI raw, chỗ này nằm ở [data.py](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/data.py:233).
+
+Sau đó code tính:
+
+```text
+right_x = x - d
+```
+
+tức là:
+
+- biết pixel trái nằm ở đâu
+- biết độ lệch ngang thật là bao nhiêu
+- thì suy ra điểm tương ứng bên ảnh phải nằm ở đâu
+
+### Vậy “điểm đúng” trong vector score là điểm nào?
+
+Trong repo này, `right_patch_strip` được cắt sao cho:
+
+- vị trí đúng rơi vào giữa dải tìm kiếm
+
+Nên ground truth label không phải là một chỉ số ngẫu nhiên chạy lung tung.
+
+Nó được chuẩn hoá về giữa vector output.
+
+Trong code:
+
+- `center_label = disp_range // 2`
+
+nghĩa là:
+
+- nếu `disp_range = 256`
+- thì vị trí "đúng tâm" là index `128`
+
+Tức là model luôn được huấn luyện theo kiểu:
+
+- vị trí đúng nhất nằm ở giữa vector output
+- các vị trí lệch sang trái/phải quanh nó là các disparity gần đúng
+
+### Vì sao làm như vậy?
+
+Vì sample train không cắt một patch phải đúng khít tại đúng điểm match.
+
+Thay vào đó, nó cắt một dải rộng hơn quanh `right_x`.
+
+Nên:
+
+- điểm đúng nằm trong dải đó
+- và được đặt vào giữa để mọi sample có cùng quy ước nhãn
+
+Nhờ vậy, output luôn có cùng ý nghĩa:
+
+- index giữa là disparity đúng
+- index bên trái/phải là lệch ít nhiều so với disparity đúng
+
+### Ví dụ số rất cụ thể
+
+Giả sử:
+
+- lấy một pixel trên thân cây ở ảnh trái
+- tọa độ là `(x=500, y=200)`
+- từ `disp_noc`, đọc được disparity thật là `d = 8`
+
+Khi đó:
+
+```text
+right_x = 500 - 8 = 492
+```
+
+Nghĩa là:
+
+- điểm tương ứng của pixel thân cây đó ở ảnh phải nằm tại `x = 492`
+
+Code sẽ làm:
+
+1. Cắt `left_patch` quanh `(500, 200)`
+2. Cắt `right_patch_strip` quanh vùng chứa `x = 492`
+3. Sắp vùng đó sao cho vị trí đúng nằm ở giữa output
+4. Model sinh ra vector `256` score
+5. Ground truth bảo rằng:
+   - score ở giữa phải lớn nhất
+   - score lệch `1` pixel vẫn được điểm một phần
+   - score lệch `2` pixel vẫn được điểm ít hơn
+
+Nếu dùng nhãn mềm mặc định thì target trông như:
+
+```text
+..., 0, 0.05, 0.2, 0.5, 0.2, 0.05, 0, ...
+```
+
+trong đó:
+
+- `0.5` nằm ở index giữa
+- hai bên là các vị trí gần đúng
+
+### Nói cực ngắn theo trực giác
+
+Model làm việc như sau:
+
+1. Patch trái được mã hoá thành 1 vector
+2. Dải patch phải được mã hoá thành nhiều vector
+3. Model chấm điểm từng vector phải với vector trái
+4. Ground truth nói:
+   - vị trí giữa mới là đúng nhất
+   - quanh nó cũng được chấp nhận một phần
+
+Nên:
+
+- vector score là "mức khớp theo từng disparity ứng viên"
+- ground truth là "phân phối xác suất mong muốn trên vector đó"
+
 ## 5. Suy luận
 
 Khi test full image:
