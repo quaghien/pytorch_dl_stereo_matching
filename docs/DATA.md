@@ -389,11 +389,7 @@ Các file liên quan:
 - `colored_*`: ảnh màu để quan sát cho dễ, nhưng train mặc định không dùng
 - `calib`: thông tin camera, repo hiện tại không dùng nó trong train patch mặc định
 
-Bạn có thể xem ảnh ghép minh hoạ:
-
-- [sample_000000_10.png](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/figures/data_samples/sample_000000_10.png)
-- [sample_000001_10.png](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/figures/data_samples/sample_000001_10.png)
-- [sample_000002_10.png](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/figures/data_samples/sample_000002_10.png)
+Repo hiện tại chưa có các ảnh ghép minh hoạ `figures/data_samples/*`, nên phần này chưa thể mở link preview trực tiếp từ repo.
 
 ## 6. Code train thật sự lấy dữ liệu từ đâu?
 

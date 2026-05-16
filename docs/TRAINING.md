@@ -11,7 +11,7 @@ Tài liệu này giải thích theo góc nhìn thực hành:
 
 Ảnh kiến trúc model:
 
-- [model_architecture.svg](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/figures/model_architecture.svg)
+- [model_architecture.svg](../figures/model_architecture.svg)
 
 Hình này có ghi rõ:
 
@@ -53,7 +53,7 @@ Biến đổi dữ liệu chính chỉ là:
 
 ## 2. Dữ liệu train đi từ đâu vào đâu
 
-Với dữ liệu hiện có trong repo, train đi theo nhánh KITTI raw trong [data.py](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/data.py:299).
+Với dữ liệu hiện có trong repo, train đi theo nhánh KITTI raw trong [data.py](../data.py).
 
 Luồng chính:
 
@@ -90,7 +90,7 @@ Code hiện tại không thấy các bước như:
 
 ### Có normalize
 
-Ảnh được chuẩn hoá bằng [normalize_image()](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/data.py:38):
+Ảnh được chuẩn hoá bằng [normalize_image()](../data.py):
 
 ```python
 (image - mean) / std
@@ -214,7 +214,7 @@ Nếu `disp_range = 256`:
 
 ## 7. Model kiến trúc như thế nào
 
-Code model nằm ở [models.py](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/models.py:8).
+Code model nằm ở [models.py](../models.py).
 
 Repo có 2 cấu hình chính:
 
@@ -292,7 +292,7 @@ Trong đó:
 
 ## 9. Loss là gì và công thức ra sao
 
-Loss được định nghĩa ở [soft_target_cross_entropy()](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/models.py:76).
+Loss được định nghĩa ở [soft_target_cross_entropy()](../models.py).
 
 Code:
 
@@ -353,7 +353,7 @@ Hiểu dễ:
 
 ## 11. Train loop chạy như thế nào
 
-Ở [train.py](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/train.py:124), mỗi step train làm như sau:
+Ở [train.py](../train.py), mỗi step train làm như sau:
 
 1. Lấy một batch patch trái, patch phải, target
 2. Chạy model để ra `logits`
@@ -375,7 +375,7 @@ Preset khuyến nghị trong repo hiện tại là:
 
 ## 12. Validate đo cái gì
 
-Ở [evaluate.py](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/evaluate.py:24), code:
+Ở [evaluate.py](../evaluate.py), code:
 
 - lấy `argmax` của output
 - so với vị trí center label

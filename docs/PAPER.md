@@ -103,7 +103,7 @@ Trong code:
 d = disparity[y, x]
 ```
 
-Ở nhánh KITTI raw, chỗ này nằm ở [data.py](/home/quanghien/aivn/stereo/dl_stereo_matching_pytorch/data.py:233).
+Ở nhánh KITTI raw, chỗ này nằm ở [data.py](../data.py).
 
 Sau đó code tính:
 
